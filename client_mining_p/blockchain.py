@@ -129,7 +129,7 @@ def mine():
     # if proof and id not in request.json return 400 with a message 
     # Forge the new Block by adding it to the chain with the proof 
     last_block_string = json.dumps(blockchain.last_block, sort_keys=True)
-    print('block chain validation', blockchain.valid_proof(last_block_string, request.json['proof']))
+    # print('block chain validation', blockchain.valid_proof(last_block_string, request.json['proof']))
 
     if 'id' not in request.json or 'proof' not in request.json:
         response = {
