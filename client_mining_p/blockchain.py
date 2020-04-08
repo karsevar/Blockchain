@@ -135,12 +135,6 @@ blockchain = Blockchain()
 @app.route('/mine', methods=['POST'])
 def mine():
     # Run the proof of work algorithm to get the next proof
-    # proof = blockchain.proof_of_work(blockchain.last_block)
-    # Forge the new Block by adding it to the chain with the proof
-    # previous_hash = blockchain.hash(blockchain.last_block) 
-    # block = blockchain.new_block(proof, previous_hash)
-
-    print('request body', 'id' in request.json)
 
     # get the last block from the block chain 
 
@@ -148,10 +142,33 @@ def mine():
     # blockchain.valid_proof function 
 
     # if true return message New Block Has been forged
+        # create a new block in the block chain.
     # if false return message invalid proof 
     # if proof and id not in request.json return 400 with a message 
 
-    return f'hello there!!!'
+    proof = blockchain.proof_of_work(blockchain.last_block)
+    print('request body proof', request.json['proof'])
+    print('server proof', proof)
+    # Forge the new Block by adding it to the chain with the proof 
+    last_block_string = json.dumps(blockchain.last_block, sort_keys=True)
+    print('block chain validation', blockchain.valid_proof(last_block_string, request.json['proof']))
+
+    if 'id' not in request.json and 'proof' not in request.json:
+        response = {
+            'message': 'Missing id or proof in response'
+        }
+        return jsonify(response), 400 
+
+    if blockchain.valid_proof(last_block_string, request.json['proof']):
+        previous_hash = blockchain.hash(blockchain.last_block)
+        block = blockchain.new_block(request.json['proof'], previous_hash)
+        print('new block', block)
+        response = {
+            'message': 'New block has been forged!'
+        }
+        return jsonify(response)
+
+    return f'Something didnt work!'
 
 @app.route('/last_block', methods=['GET'])
 def last_block():
