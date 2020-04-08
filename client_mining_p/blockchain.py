@@ -131,7 +131,7 @@ def mine():
     last_block_string = json.dumps(blockchain.last_block, sort_keys=True)
     print('block chain validation', blockchain.valid_proof(last_block_string, request.json['proof']))
 
-    if 'id' not in request.json and 'proof' not in request.json:
+    if 'id' not in request.json or 'proof' not in request.json:
         response = {
             'message': 'Missing id or proof in response'
         }
@@ -140,13 +140,19 @@ def mine():
     if blockchain.valid_proof(last_block_string, request.json['proof']):
         previous_hash = blockchain.hash(blockchain.last_block)
         block = blockchain.new_block(request.json['proof'], previous_hash)
-        print('new block', block)
+        # print('new block', block)
         response = {
-            'message': 'New block has been forged!'
+            'new_block': block,
+            'message': 'New block forged!'
         }
-        return jsonify(response)
+        return jsonify(response), 200
 
-    return f'Something didnt work!'
+    else:
+        response = {
+            'message': 'Invalid proof for last block in the chain'
+        }
+
+        return jsonify(response), 400
 
 @app.route('/last_block', methods=['GET'])
 def last_block():
