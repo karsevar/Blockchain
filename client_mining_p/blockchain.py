@@ -86,24 +86,6 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
 
-    def proof_of_work(self, block):
-        """
-        Simple Proof of Work Algorithm
-        Stringify the block and look for a proof.
-        Loop through possibilities, checking each one against `valid_proof`
-        in an effort to find a number that is a valid proof
-        :return: A valid proof for the provided block
-        """
-        block_string = json.dumps(block, sort_keys= True)
-        proof = 0 
-
-        # guess numbers until we find the right one that will give back the 
-        # proper amount of leading zeros.
-        while self.valid_proof(block_string, proof) is False:
-            proof += 1
-
-        return proof
-
     @staticmethod
     def valid_proof(block_string, proof):
         """
@@ -119,7 +101,7 @@ class Blockchain(object):
         guess = f'{block_string}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
 
-        return guess_hash[:3] == '000'
+        return guess_hash[:6] == '000000'
 
 
 # Instantiate our Node
@@ -145,10 +127,6 @@ def mine():
         # create a new block in the block chain.
     # if false return message invalid proof 
     # if proof and id not in request.json return 400 with a message 
-
-    proof = blockchain.proof_of_work(blockchain.last_block)
-    print('request body proof', request.json['proof'])
-    print('server proof', proof)
     # Forge the new Block by adding it to the chain with the proof 
     last_block_string = json.dumps(blockchain.last_block, sort_keys=True)
     print('block chain validation', blockchain.valid_proof(last_block_string, request.json['proof']))
